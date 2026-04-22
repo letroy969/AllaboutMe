@@ -3,7 +3,7 @@
 > Full Stack Developer | ICT Applications Development Student @ UMP  
 > AWS · Azure · React · Python · Java · Docker  
 
-🌐 **Live:** https://letroy969.github.io/Personal-Portfolio/
+🌐 **Live** https://allabout-me.vercel.app/
 
 ---
 
