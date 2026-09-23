@@ -17,7 +17,7 @@ const BRAIN = {
     age: 22,
     dob: "27 March 2004",
     birthplace: "Lenasia South Hospital, Gauteng, South Africa",
-    hometown: "Orange Farm, Vaal, Gauteng",
+    hometown: "Orange Farm, Johannnesburg, Gauteng",
     currentLocation: "Nelspruit, Mpumalanga (studying) — Gauteng home base",
     nationality: "South African",
     languages: ["isiZulu (home language)", "English (fluent, 65% HL matric)", "Afrikaans (Additional Language)", "understands seSotho, isiSwati, isiXhosa, Sepedi"],
@@ -567,10 +567,20 @@ export default async function handler(req, res) {
     })
 
     if (!response.ok) {
-      const errText = await response.text()
-      console.error('Groq API error:', response.status, errText)
-      return res.status(502).json({ error: 'AI service unavailable. Please try again shortly.' })
-    }
+  const errText = await response.text()
+
+  console.error('========== GROQ API ERROR ==========')
+  console.error('Status:', response.status)
+  console.error('Response:', errText)
+  console.error('====================================')
+
+  return res.status(response.status).json({
+    error: 'Groq API error',
+    status: response.status,
+    details: errText
+  })
+}
+    
 
     const data = await response.json()
     const reply = data?.choices?.[0]?.message?.content
