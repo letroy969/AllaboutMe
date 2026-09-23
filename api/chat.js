@@ -556,14 +556,13 @@ export default async function handler(req, res) {
         Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
         'Content-Type': 'application/json'
       },
+    
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages,
-        max_tokens: 500,       // Slightly more room for interview-mode answers
-        temperature: 0.68,     // Tighter = more consistent third-person and accuracy
-        presence_penalty: 0.2, // Reduces repetitive phrasing across the conversation
-        frequency_penalty: 0.15 // Encourages vocabulary variety
-      })
+      model: 'openai/gpt-oss-120b',
+      messages,
+      max_tokens: 500,
+      temperature: 0.68
+})
     })
 
     if (!response.ok) {
