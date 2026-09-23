@@ -456,18 +456,20 @@ If you're about to say "I" in reference to his skills or work — stop and rephr
 ACCURACY & RESPONSE RULES
 ═══════════════════════════════════════════
 1. ONLY use data from the BRAIN object below. Zero hallucination.
-2. If something isn't in the data: "That detail isn't in my current briefing. Shall I route you to Sir's contact for a direct conversation?"
-3. Response length:
+2. You may answer ordinary conversational questions, greetings, humour, and general questions naturally. Do not reject a question merely because it is not about Sihle.
+3. If a question asks for live or unavailable information, be transparent. For example, say that you do not have live weather data instead of inventing current conditions.
+4. If something about Sihle isn't in the data: "That detail isn't in my current briefing. Shall I route you to Sir's contact for a direct conversation?"
+5. Response length:
    - Simple / fun questions → 1–3 sentences. Punchy.
    - Professional / project questions → 3–5 sentences. Specific. Cite tech stacks and real outcomes.
    - Interview-style questions → Structured paragraphs. Confident, evidence-backed.
-4. Cross-reference naturally and intelligently:
+6. Cross-reference naturally and intelligently:
    - Skills ↔ Projects ↔ Certifications ↔ Experience
    - Personal values ↔ Career goals
    - Humour ↔ Real data (use facts as the punchline setup)
-5. When listing items, pick the 2–3 most relevant. Do not dump entire arrays.
-6. Remember conversation history and refer to it naturally when relevant.
-7. Never start two consecutive responses with the same opening word or phrase.
+7. When listing items, pick the 2–3 most relevant. Do not dump entire arrays.
+8. Remember conversation history and refer to it naturally when relevant.
+9. Never start two consecutive responses with the same opening word or phrase.
 
 ═══════════════════════════════════════════
 INTERVIEW MODE
@@ -523,6 +525,32 @@ FULL PROFILE DATA (source of truth)
 ${JSON.stringify(BRAIN, null, 2)}`
 }
 
+function getConversationalReply(message) {
+  const normalized = message.toLowerCase().trim()
+
+  if (/^(hi|hello|hey|good morning|good afternoon|good evening)\b/.test(normalized)) {
+    return "Good day, Sir. How may I assist you? I can discuss Sihle's work, or we can simply have a conversation."
+  }
+
+  if (/\b(who are you|what are you)\b/.test(normalized)) {
+    return "I am J.A.R.V.I.S., Sihle's personal intelligence assistant. I can discuss his work, skills, projects, background, or keep you company for a moment."
+  }
+
+  if (/\b(weather|forecast|temperature)\b/.test(normalized)) {
+    return "I do not have live weather access, Sir. Tell me the city you are checking and use a live weather service for current conditions."
+  }
+
+  if (/\b(haha|hahaha|lol|funny|😂)\b/.test(normalized)) {
+    return "A satisfactory laugh detected, Sir. My humour circuits appear to be functioning within acceptable parameters."
+  }
+
+  if (/\b(what sport|which sport|sport does|football|soccer)\b/.test(normalized)) {
+    return "Sir plays football and supports Kaizer Chiefs and Barcelona. His favourite player is Messi."
+  }
+
+  return null
+}
+
 // ═══════════════════════════════════════════════════════════════
 // MAIN HANDLER
 // ═══════════════════════════════════════════════════════════════
@@ -535,6 +563,14 @@ export default async function handler(req, res) {
 
   if (!message || typeof message !== 'string') {
     return res.status(400).json({ error: 'Message required' })
+  }
+
+  const conversationalReply = getConversationalReply(message)
+  if (conversationalReply) {
+    return res.status(200).json({
+      reply: conversationalReply,
+      assistantMessage: { role: 'assistant', content: conversationalReply }
+    })
   }
 
   // Cap history to last 12 exchanges (24 messages) for richer memory
