@@ -536,6 +536,14 @@ function getConversationalReply(message) {
     return "I am J.A.R.V.I.S., Sihle's personal intelligence assistant. I can discuss his work, skills, projects, background, or keep you company for a moment."
   }
 
+  if (/^(sihle|who is sihle|tell me about sihle)\b/.test(normalized)) {
+    return "Sihle Dladla is an ICT Applications Development graduate and Advanced Diploma student focused on software development, cloud, cybersecurity, and AI-driven systems."
+  }
+
+  if (/\b(where does|where is|location|live|stay|based)\b/.test(normalized) && /\bsihle\b|he\b/.test(normalized)) {
+    return "Sir is from Orange Farm, Johannesburg, Gauteng, and is currently studying in Nelspruit, Mpumalanga."
+  }
+
   if (/\b(weather|forecast|temperature)\b/.test(normalized)) {
     return "I do not have live weather access, Sir. Tell me the city you are checking and use a live weather service for current conditions."
   }
@@ -548,7 +556,29 @@ function getConversationalReply(message) {
     return "Sir plays football and supports Kaizer Chiefs and Barcelona. His favourite player is Messi."
   }
 
+  if (/^h{2,}$/i.test(normalized)) {
+    return "Still online, Sir. I’m listening."
+  }
+
   return null
+}
+
+function getServiceFallback(message) {
+  const normalized = message.toLowerCase().trim()
+
+  if (/\b(where does|where is|location|live|stay|based)\b/.test(normalized) && /\bsihle\b|he\b/.test(normalized)) {
+    return "Sir is from Orange Farm, Johannesburg, Gauteng, and is currently studying in Nelspruit, Mpumalanga."
+  }
+
+  if (/\bsihle\b|\bwho is he\b/.test(normalized)) {
+    return "Sihle Dladla is an ICT Applications Development graduate and Advanced Diploma student focused on software development, cloud, cybersecurity, and AI-driven systems."
+  }
+
+  if (/^h{2,}$/i.test(normalized)) {
+    return "Still online, Sir. I’m listening."
+  }
+
+  return "I’m still online, but the language service is temporarily unavailable. You can ask about Sihle’s projects, skills, education, certifications, experience, or general topics."
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -609,10 +639,10 @@ export default async function handler(req, res) {
   console.error('Response:', errText)
   console.error('====================================')
 
-  return res.status(response.status).json({
-    error: 'Groq API error',
-    status: response.status,
-    details: errText
+  const fallbackReply = getServiceFallback(message)
+  return res.status(200).json({
+    reply: fallbackReply,
+    assistantMessage: { role: 'assistant', content: fallbackReply }
   })
 }
     
@@ -631,6 +661,10 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('Handler error:', err)
-    return res.status(500).json({ error: 'Internal server error.' })
+    const fallbackReply = getServiceFallback(message)
+    return res.status(200).json({
+      reply: fallbackReply,
+      assistantMessage: { role: 'assistant', content: fallbackReply }
+    })
   }
 }
